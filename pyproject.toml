@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "abtest"
+version = "0.1.0"
+description = "How many A/B test winners are real, and how inflated are their lifts? An analysis of the Upworthy Research Archive."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "statsmodels",
+    "duckdb",
+    "dbt-duckdb",
+    "pyarrow",
+    "matplotlib",
+    "requests",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "hypothesis",
+    "ruff",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["dbt/target", "dbt/logs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
