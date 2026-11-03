@@ -1,0 +1,105 @@
+version: 2
+
+models:
+  - name: fct_tests
+    description: One row per A/B test (clickability_test_id), built from int_test_arms.
+    data_tests:
+      - expression_is_true:
+          name: fct_tests_has_at_least_two_arms
+          description: >
+            A test needs at least two arms to compare. Single-arm tests are kept and reported as a
+            warning, not an error; filter on n_arms >= 2 in analysis.
+          config:
+            severity: warn
+          arguments:
+            expression: "n_arms >= 2"
+      - expression_is_true:
+          name: fct_tests_at_most_one_declared_winner
+          description: Upworthy should declare at most one winner per test; extra winners are reported as a warning.
+          config:
+            severity: warn
+          arguments:
+            expression: "n_declared_winners <= 1"
+      - expression_is_true:
+          name: fct_tests_aa_flag_matches_pairs
+          arguments:
+            expression: "has_aa_pair = (n_aa_pairs > 0)"
+    columns:
+      - name: clickability_test_id
+        data_tests: [unique, not_null]
+      - name: source_part
+        description: Part the test belongs to (a test never spans parts).
+      - name: start_date
+        description: Date of the earliest arm's created_at.
+      - name: test_week
+        description: Earliest test_week among the arms.
+      - name: n_arms
+        description: Arms after dedupe.
+        data_tests: [not_null]
+      - name: total_impressions
+        description: Sum of impressions across arms.
+      - name: impressions_per_arm
+        description: total_impressions / n_arms.
+      - name: best_ctr
+        description: Highest arm ctr.
+      - name: worst_ctr
+        description: Lowest arm ctr.
+      - name: best_ctr_arm_number
+        description: arm_number with the highest ctr.
+      - name: n_declared_winners
+        description: Arms Upworthy marked winner = true.
+      - name: winner_arm_number
+        description: arm_number of Upworthy's declared winner (the first one, if several).
+      - name: winner_package_id
+        description: package_id of Upworthy's declared winner.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('int_test_arms')
+                field: package_id
+      - name: winner_headline
+        description: Headline of Upworthy's declared winner.
+      - name: winner_ctr
+        description: ctr of Upworthy's declared winner.
+      - name: randomization_risk
+        description: Any arm of the test is flagged randomization_risk.
+        data_tests: [not_null]
+      - name: has_aa_pair
+        description: The test contains at least one pair of identical arms.
+        data_tests: [not_null]
+      - name: n_identical_arms
+        description: Arms that belong to an identical group.
+      - name: n_aa_pairs
+        description: Rows for this test in fct_aa_pairs.
+      - name: n_duplicates_dropped
+        description: Exact duplicate rows removed from this test.
+
+  - name: fct_aa_pairs
+    description: >
+      Every pair of identical arms within a test (same headline and eyecatcher_id). Because both
+      arms show visitors the same thing, any difference in ctr is noise: these are natural A/A tests.
+    columns:
+      - name: aa_pair_id
+        description: "`<clickability_test_id>:<arm_a_number>-<arm_b_number>`"
+        data_tests: [unique, not_null]
+      - name: clickability_test_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_tests')
+                field: clickability_test_id
+      - name: arm_a_number
+        description: The lower arm_number of the pair.
+      - name: arm_b_number
+        description: The higher arm_number of the pair.
+      - name: impressions_a
+      - name: impressions_b
+      - name: clicks_a
+      - name: clicks_b
+      - name: ctr_a
+      - name: ctr_b
+      - name: group_size
+        description: Number of identical arms in the group this pair comes from.
+      - name: randomization_risk
+        description: Either arm is flagged randomization_risk.
