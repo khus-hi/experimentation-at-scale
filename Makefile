@@ -2,7 +2,7 @@ PYTHON ?= python3.11
 VENV := .venv
 PY := $(VENV)/bin/python
 
-.PHONY: setup ingest build docs summary test analysis report all
+.PHONY: setup ingest build docs summary fixture test analysis report all
 
 DB := $(CURDIR)/data/upworthy.duckdb
 DBT := cd dbt && UPWORTHY_DB=$(DB) DBT_PROFILES_DIR=. ../$(PY) -W ignore::RuntimeWarning -m dbt.cli.main
@@ -26,6 +26,9 @@ docs:
 
 summary:
 	$(PY) dbt/summary.py --db $(DB)
+
+fixture:
+	$(PY) tests/fixtures/make_fixture.py --db $(DB)
 
 test:
 	$(PY) -m pytest

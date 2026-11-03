@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Ruff
+        run: |
+          python -m ruff check .
+          python -m ruff format --check .
+
+      - name: Pytest with coverage (src/abtest must stay at 90% or more)
+        run: python -m pytest --cov=abtest --cov-report=term-missing --cov-fail-under=90
+
+      - name: dbt build on the committed fixture
+        env:
+          UPWORTHY_DB: ${{ runner.temp }}/fixture.duckdb
+          DBT_PROFILES_DIR: ${{ github.workspace }}/dbt
+        run: |
+          python tests/fixtures/load_fixture.py --db "$UPWORTHY_DB"
+          cd dbt
+          python -W ignore::RuntimeWarning -m dbt.cli.main build
+          cd ..
+          python dbt/summary.py --db "$UPWORTHY_DB"
