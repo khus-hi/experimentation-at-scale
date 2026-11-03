@@ -168,3 +168,18 @@ def test_aa_pairs(built):
 def test_single_arm_test_is_a_warning(built):
     _, _, stdout = built
     assert "WARN 1 fct_tests_has_at_least_two_arms" in stdout
+
+
+def test_srm_scan_on_built_models(built):
+    sys.path.insert(0, str(ROOT / "analysis"))
+    import srm_scan
+
+    has_column, con, _ = built
+    result = srm_scan.scan(con.execute(srm_scan.ARMS_SQL).fetchall())
+    a = result.groups["all"]
+    # t4 is the single-arm test; t1 (1000/1000/1000), t3 (300 x 3) are balanced; t2 has
+    # 800/900/700/600 (p ~ 1e-6) and t5 is 400/400
+    assert (a.tests, a.single_arm, a.checked, a.srm) == (5, 1, 4, 1)
+    assert result.groups["inside"].srm == 1
+    assert result.groups["inside"].tests == (2 if has_column else 1)
+    assert "single-arm" in srm_scan.report(result)

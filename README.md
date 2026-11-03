@@ -39,6 +39,19 @@ dbt models (DuckDB schemas `staging`, `intermediate`, `marts`):
 
 `randomization_risk` is true when the archive's own risk column says so (if the loaded files have one; the 2020/2021 OSF files do not) or when the package was created between 2013-06-25 and 2014-01-10.
 
+## Statistics (`src/abtest`)
+
+Pure functions on counts that return frozen dataclasses; no pandas in the math.
+
+| module | what |
+| --- | --- |
+| `abtest.proportions` | pooled two-proportion z-test, Wilson CI per arm, Newcombe CI for the difference, relative lift with a delta-method CI, chi-square omnibus plus every arm vs a control (`multi_arm_test`) |
+| `abtest.power` | sample size per arm for a baseline and relative MDE, MDE for a given n, achieved power for observed n; k arms with Bonferroni `alpha / (k - 1)` (matches statsmodels `NormalIndPower`) |
+| `abtest.srm` | sample ratio mismatch: chi-square goodness of fit vs the expected split, flagged at p < 0.001 |
+
+`make srm` runs the SRM check and the omnibus test on every test in `fct_tests` and prints
+counts overall and inside vs outside the randomization-risk window (`analysis/srm_scan.py`).
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request: ruff (lint and
