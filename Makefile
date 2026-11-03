@@ -2,7 +2,10 @@ PYTHON ?= python3.11
 VENV := .venv
 PY := $(VENV)/bin/python
 
-.PHONY: setup ingest build test analysis report all
+.PHONY: setup ingest build docs summary test analysis report all
+
+DB := $(CURDIR)/data/upworthy.duckdb
+DBT := cd dbt && UPWORTHY_DB=$(DB) DBT_PROFILES_DIR=. ../$(PY) -W ignore::RuntimeWarning -m dbt.cli.main
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -15,7 +18,14 @@ ingest:
 	$(PY) -m ingest.load
 
 build:
-	$(PY) -c "print('build (dbt): not implemented yet')"
+	($(DBT) build); status=$$?; $(PY) dbt/summary.py --db $(DB); exit $$status
+
+docs:
+	($(DBT) docs generate --static)
+	@echo "docs written to dbt/target/static_index.html (open it in a browser)"
+
+summary:
+	$(PY) dbt/summary.py --db $(DB)
 
 test:
 	$(PY) -m pytest

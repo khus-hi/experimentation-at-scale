@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: int_test_arms
+    description: >
+      Arms after removing exact duplicate rows (same values in every content column), numbered
+      within each test by created_at, with identical arms flagged. Identical arms share a test,
+      a headline and an eyecatcher_id (both non-null) and are natural A/A tests.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: ["clickability_test_id", "arm_number"]
+    columns:
+      - name: package_id
+        data_tests: [unique, not_null]
+      - name: clickability_test_id
+        data_tests: [not_null]
+      - name: arm_number
+        description: 1-based position of the arm within its test, ordered by created_at then source row.
+        data_tests: [not_null]
+      - name: n_duplicates_dropped
+        description: How many exact copies of this row were removed.
+      - name: is_identical_arm
+        description: Another arm in the same test has the same headline and eyecatcher_id.
+        data_tests: [not_null]
+      - name: identical_group_first_arm
+        description: arm_number of the first arm in this arm's identical group; null if not identical.
+      - name: n_identical_in_group
+        description: Size of the identical group this arm belongs to (1 if not identical).
+      - name: is_strict_identical_arm
+        description: Identical, and excerpt and lede also match (null matches null).
+        data_tests: [not_null]
+      - name: n_strict_identical_in_group
+        description: Size of the strictly identical group (1 if none).

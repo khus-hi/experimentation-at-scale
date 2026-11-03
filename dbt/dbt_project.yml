@@ -1,0 +1,33 @@
+name: upworthy
+version: "0.1.0"
+config-version: 2
+profile: upworthy
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+target-path: target
+clean-targets: ["target", "logs"]
+
+flags:
+  send_anonymous_usage_stats: false
+
+vars:
+  # Known randomization problem window (Matias et al.): packages created in it are at risk.
+  randomization_risk_start: "2013-06-25"
+  randomization_risk_end: "2014-01-10"
+  # Column-name fragments that identify the archive's own randomization-risk flag, if present.
+  randomization_risk_hints: ["problem", "randomiz", "randomis", "imbalance"]
+  source_parts: ["exploratory", "confirmatory", "holdout"]
+
+models:
+  upworthy:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: table
+    marts:
+      +schema: marts
+      +materialized: table

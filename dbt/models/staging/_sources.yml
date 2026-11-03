@@ -1,0 +1,62 @@
+version: 2
+
+sources:
+  - name: upworthy
+    description: >
+      The Upworthy Research Archive (Matias, Munger, Le Quere & Ebersole 2021, Scientific Data 8:195,
+      doi:10.1038/s41597-021-00934-7; OSF project jd64p). Each row is one "package": a headline
+      and image combination that Upworthy's Clickability tool showed to a random slice of visitors.
+      Packages that share a clickability_test_id were tested against each other.
+      Loaded by `make ingest` (ingest/load.py) from the exploratory, confirmatory and holdout CSVs.
+      OSF publishes no separate codebook, so these descriptions follow the paper's data
+      description and the archive website (upworthy.natematias.com).
+    schema: raw
+    tables:
+      - name: packages
+        description: >
+          All released packages from the three parts, stacked with UNION ALL BY NAME.
+          32,487 tests and 150,817 packages, created 2013-01-24 to 2015-04-30.
+        columns:
+          - name: column00
+            description: Unnamed leading column of each CSV, a 0-based row index from the export. Not an Upworthy identifier, and only unique within one file.
+          - name: created_at
+            description: Time the package was created in Upworthy's system, which is close to when the test started.
+          - name: updated_at
+            description: Time the package record was last updated.
+          - name: clickability_test_id
+            description: Identifier of the A/B test. All packages with the same id were randomized against each other.
+          - name: excerpt
+            description: Article excerpt shown with the package (the short teaser text).
+          - name: headline
+            description: The headline under test.
+          - name: lede
+            description: Opening sentence or paragraph of the article.
+          - name: slug
+            description: URL slug of the article generated for the package.
+          - name: eyecatcher_id
+            description: Identifier of the image ("eyecatcher") shown with the headline. The images themselves are not in the archive.
+          - name: impressions
+            description: Number of times the package was shown to visitors during the test.
+          - name: clicks
+            description: Number of clicks the package received during the test.
+          - name: significance
+            description: Upworthy's own significance score for the package as stored by the Clickability tool. Its exact definition is undocumented; the paper advises against relying on it.
+          - name: first_place
+            description: Whether Upworthy's dashboard ranked this package first (highest click rate) when the data was exported.
+          - name: winner
+            description: Whether Upworthy's editors chose this package as the test's winner.
+          - name: share_text
+            description: Text suggested for social-media shares of the article.
+          - name: square
+            description: Square-format variant of the share image used on social media (undocumented in the paper; usually empty).
+          - name: test_week
+            description: Week the test ran, encoded as year and ISO week number (yyyyww).
+          - name: source_part
+            description: Which released part the row came from (exploratory, confirmatory, holdout). Added by ingest/load.py.
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ["exploratory", "confirmatory", "holdout"]
+          - name: source_file
+            description: Name of the CSV the row was loaded from. Added by ingest/load.py.

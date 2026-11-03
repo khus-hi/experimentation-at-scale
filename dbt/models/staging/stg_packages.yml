@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: stg_packages
+    description: >
+      One row per package (arm) from raw.packages, with types cleaned and text trimmed
+      (empty strings become null). No rows are dropped here; see int_test_arms for dedupe.
+    data_tests:
+      - expression_is_true:
+          name: stg_packages_clicks_le_impressions
+          arguments:
+            expression: "clicks <= impressions"
+      - expression_is_true:
+          name: stg_packages_impressions_positive
+          arguments:
+            expression: "impressions > 0"
+      - expression_is_true:
+          name: stg_packages_ctr_between_0_and_1
+          arguments:
+            expression: "ctr between 0 and 1"
+    columns:
+      - name: package_id
+        description: >
+          Surrogate key `<source_part>:<column00>`. The archive has no package id of its own, so
+          the CSV row index plus the part it came from identifies a package.
+        data_tests: [unique, not_null]
+      - name: source_row
+        description: column00, the row index within the source CSV.
+      - name: clickability_test_id
+        description: The A/B test this package belongs to.
+        data_tests: [not_null]
+      - name: created_at
+        description: When the package was created (timestamp).
+        data_tests: [not_null]
+      - name: updated_at
+        description: When the package record was last updated.
+      - name: test_week
+        description: Week of the test as yyyyww.
+      - name: headline
+        description: Headline under test, trimmed.
+      - name: eyecatcher_id
+        description: Image id shown with the headline, trimmed.
+      - name: excerpt
+        description: Article excerpt, trimmed.
+      - name: lede
+        description: Article lede, trimmed.
+      - name: impressions
+        description: Times the package was shown.
+        data_tests: [not_null]
+      - name: clicks
+        description: Clicks the package received.
+        data_tests: [not_null]
+      - name: ctr
+        description: Click-through rate, clicks / impressions. Null when impressions is 0.
+      - name: significance
+        description: Upworthy's own significance score (undocumented definition).
+      - name: first_place
+        description: Upworthy's dashboard ranked this package first at export time.
+      - name: winner
+        description: Upworthy's editors declared this package the winner.
+      - name: archive_randomization_risk
+        description: >
+          The archive's own randomization-risk flag, if raw.packages has such a column (any
+          column whose name contains one of var('randomization_risk_hints')). False when no such
+          column exists, which is the case for the 2020/2021 OSF files.
+      - name: in_risk_window
+        description: created_at falls between var('randomization_risk_start') and var('randomization_risk_end') (2013-06-25 to 2014-01-10), the period with a known randomization problem.
+      - name: randomization_risk
+        description: archive_randomization_risk OR in_risk_window.
+        data_tests: [not_null]
+      - name: randomization_risk_source_column
+        description: Name of the raw column used for archive_randomization_risk, or null if none was found.
+      - name: source_part
+        description: exploratory, confirmatory or holdout.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["exploratory", "confirmatory", "holdout"]
+      - name: source_file
+        description: CSV the row came from.
