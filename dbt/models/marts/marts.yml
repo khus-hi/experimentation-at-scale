@@ -23,7 +23,7 @@ models:
       - expression_is_true:
           name: fct_tests_aa_flag_matches_pairs
           arguments:
-            expression: "has_aa_pair = (n_aa_pairs > 0)"
+            expression: "has_aa_pair = (n_aa_pairs > 0) and n_strict_aa_pairs <= n_aa_pairs"
     columns:
       - name: clickability_test_id
         data_tests: [unique, not_null]
@@ -71,6 +71,11 @@ models:
         description: Arms that belong to an identical group.
       - name: n_aa_pairs
         description: Rows for this test in fct_aa_pairs.
+      - name: has_strict_aa_pair
+        description: At least one pair in fct_aa_pairs with is_strict_aa.
+        data_tests: [not_null]
+      - name: n_strict_aa_pairs
+        description: Pairs for this test in fct_aa_pairs with is_strict_aa.
       - name: n_duplicates_dropped
         description: Exact duplicate rows removed from this test.
 
@@ -101,5 +106,11 @@ models:
       - name: ctr_b
       - name: group_size
         description: Number of identical arms in the group this pair comes from.
+      - name: is_strict_aa
+        description: >
+          The two arms also share excerpt and lede (null matches null). Arms that match on
+          headline and image but differ in excerpt or lede are not true A/A tests if those texts
+          were shown to visitors.
+        data_tests: [not_null]
       - name: randomization_risk
         description: Either arm is flagged randomization_risk.

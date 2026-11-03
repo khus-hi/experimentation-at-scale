@@ -86,7 +86,9 @@ def main(argv: list[str] | None = None) -> int:
                 count(*) filter (where n_declared_winners > 1) as tests_multi_winner,
                 count(*) filter (where randomization_risk)     as risk_tests,
                 count(*) filter (where has_aa_pair)            as tests_with_aa,
-                sum(n_aa_pairs)                                as aa_pairs
+                sum(n_aa_pairs)                                as aa_pairs,
+                count(*) filter (where has_strict_aa_pair)     as tests_strict_aa,
+                sum(n_strict_aa_pairs)                         as strict_aa_pairs
             from marts.fct_tests
         """,
         )
@@ -103,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
                 count(*) filter (where randomization_risk)     as risk_tests,
                 count(*) filter (where has_aa_pair)            as tests_with_aa,
                 sum(n_aa_pairs)                                as aa_pairs,
+                sum(n_strict_aa_pairs)                         as strict_aa_pairs,
                 sum(total_impressions)                         as impressions
             from marts.fct_tests
             group by all
@@ -122,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
                 count(*) filter (where randomization_risk)     as risk_tests,
                 count(*) filter (where has_aa_pair)            as tests_with_aa,
                 sum(n_aa_pairs)                                as aa_pairs,
+                sum(n_strict_aa_pairs)                         as strict_aa_pairs,
                 round(median(impressions_per_arm))::bigint     as median_imps_per_arm
             from marts.fct_tests
             group by all
@@ -134,7 +138,9 @@ def main(argv: list[str] | None = None) -> int:
             "tests by source_part",
             """
             select source_part, count(*) as tests, sum(n_arms) as arms,
-                   count(*) filter (where has_aa_pair) as tests_with_aa, sum(n_aa_pairs) as aa_pairs
+                   count(*) filter (where has_aa_pair) as tests_with_aa,
+                   sum(n_aa_pairs) as aa_pairs,
+                   sum(n_strict_aa_pairs) as strict_aa_pairs
             from marts.fct_tests group by all order by 1
         """,
         )

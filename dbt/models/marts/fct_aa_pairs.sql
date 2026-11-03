@@ -24,6 +24,8 @@ select
     a.ctr                                                                  as ctr_a,
     b.ctr                                                                  as ctr_b,
     a.n_identical_in_group                                                 as group_size,
+    a.excerpt is not distinct from b.excerpt
+        and a.lede is not distinct from b.lede                             as is_strict_aa,
     a.randomization_risk or b.randomization_risk                          as randomization_risk,
     a.source_part
 from identical as a

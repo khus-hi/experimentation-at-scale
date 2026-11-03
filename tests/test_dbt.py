@@ -55,10 +55,10 @@ CONFIRMATORY = [
     row(6, "t5", "2014-05-01 09:01:00", "NoImg", "", 400, 8),
 ]
 HOLDOUT = [
-    # t3: three identical arms -> 3 A/A pairs
+    # t3: three identical arms -> 3 A/A pairs; arm 3 has a different lede, so only 1-2 is strict
     row(0, "t3", "2014-06-01 12:00:00", "Triple", "e5", 300, 3),
     row(1, "t3", "2014-06-01 12:01:00", "Triple", "e5", 300, 6),
-    row(2, "t3", "2014-06-01 12:02:00", "Triple", "e5", 300, 9),
+    row(2, "t3", "2014-06-01 12:02:00", "Triple", "e5", 300, 9, lede="other lede"),
 ]
 
 
@@ -149,15 +149,20 @@ def test_aa_pairs(built):
     _, con, _ = built
     rows = q(
         con,
-        "select aa_pair_id, impressions_a, impressions_b, clicks_a, clicks_b "
+        "select aa_pair_id, impressions_a, impressions_b, clicks_a, clicks_b, is_strict_aa "
         "from marts.fct_aa_pairs order by 1",
     )
     assert rows == [
-        ("t2:1-2", 800, 900, 8, 9),
-        ("t3:1-2", 300, 300, 3, 6),
-        ("t3:1-3", 300, 300, 3, 9),
-        ("t3:2-3", 300, 300, 6, 9),
+        ("t2:1-2", 800, 900, 8, 9, True),
+        ("t3:1-2", 300, 300, 3, 6, True),
+        ("t3:1-3", 300, 300, 3, 9, False),
+        ("t3:2-3", 300, 300, 6, 9, False),
     ]
+    assert q(
+        con,
+        "select clickability_test_id, n_strict_aa_pairs from marts.fct_tests "
+        "where has_strict_aa_pair order by 1",
+    ) == [("t2", 1), ("t3", 1)]
 
 
 def test_single_arm_test_is_a_warning(built):

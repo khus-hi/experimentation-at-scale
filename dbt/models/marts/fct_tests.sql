@@ -48,7 +48,10 @@ tests as (
 
 pairs as (
 
-    select clickability_test_id, count(*) as n_aa_pairs
+    select
+        clickability_test_id,
+        count(*)                                                as n_aa_pairs,
+        count(*) filter (where is_strict_aa)                    as n_strict_aa_pairs
     from {{ ref('fct_aa_pairs') }}
     group by 1
 
@@ -78,6 +81,8 @@ select
     t.n_identical_arms > 0                                      as has_aa_pair,
     t.n_identical_arms,
     coalesce(p.n_aa_pairs, 0)                                   as n_aa_pairs,
+    coalesce(p.n_strict_aa_pairs, 0) > 0                        as has_strict_aa_pair,
+    coalesce(p.n_strict_aa_pairs, 0)                            as n_strict_aa_pairs,
     t.n_duplicates_dropped
 from tests as t
 left join winners as w using (clickability_test_id)

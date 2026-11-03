@@ -27,3 +27,8 @@ models:
         description: arm_number of the first arm in this arm's identical group; null if not identical.
       - name: n_identical_in_group
         description: Size of the identical group this arm belongs to (1 if not identical).
+      - name: is_strict_identical_arm
+        description: Identical, and excerpt and lede also match (null matches null).
+        data_tests: [not_null]
+      - name: n_strict_identical_in_group
+        description: Size of the strictly identical group (1 if none).
