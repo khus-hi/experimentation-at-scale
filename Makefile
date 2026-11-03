@@ -11,7 +11,8 @@ setup:
 	$(PY) -c "import sys; print(sys.executable)"
 
 ingest:
-	$(PY) -c "print('ingest: not implemented yet')"
+	$(PY) -m ingest.download
+	$(PY) -m ingest.load
 
 build:
 	$(PY) -c "print('build (dbt): not implemented yet')"
