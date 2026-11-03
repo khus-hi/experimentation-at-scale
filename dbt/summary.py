@@ -33,7 +33,8 @@ def table(con: duckdb.DuckDBPyConnection, title: str, sql: str) -> None:
 def exists(con: duckdb.DuckDBPyConnection, schema: str, name: str) -> bool:
     return bool(
         con.execute(
-            "select count(*) from information_schema.tables where table_schema = ? and table_name = ?",
+            "select count(*) from information_schema.tables "
+            "where table_schema = ? and table_name = ?",
             [schema, name],
         ).fetchall()[0][0]
     )
