@@ -194,8 +194,16 @@ def load_manifest() -> dict:
 
 
 def local_name(f: OsfFile) -> str:
-    """Flatten the OSF path into one file name; keep the plain name when possible."""
-    return f.name if f.node == NODE_ID else f"{f.node}__{f.name}"
+    """Flatten the OSF path into one file name.
+
+    Part CSVs keep their plain name. Docs and other files get their folder as a
+    prefix, because several folders hold a README.md that would overwrite each other.
+    """
+    parts = [p for p in f.path.strip("/").split("/")[:-1] if p]
+    name = f.name
+    if f.category not in PARTS and parts:
+        name = "__".join([*parts, name])
+    return name if f.node == NODE_ID else f"{f.node}__{name}"
 
 
 def download(session: requests.Session, f: OsfFile, manifest: dict) -> str:

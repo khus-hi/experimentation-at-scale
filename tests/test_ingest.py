@@ -84,3 +84,34 @@ def test_load_tags_parts(tmp_path: Path, capsys):
     assert rows == [("confirmatory", 1), ("exploratory", 2)]
     out = capsys.readouterr().out
     assert "flagged total: 1 tests" in out
+
+
+def test_readmes_in_different_folders_do_not_collide():
+    a = download.OsfFile(
+        "a", "README.md", "/google-analytics-data/README.md", "jd64p", 1, None, "u", None, None
+    )
+    b = download.OsfFile(
+        "b",
+        "README.md",
+        "/upworthy-timestamped-screenshots/README.md",
+        "jd64p",
+        1,
+        None,
+        "u",
+        None,
+        None,
+    )
+    c = download.OsfFile(
+        "c",
+        "x-holdout-packages.csv",
+        "/upworthy-archive-datasets/x-holdout-packages.csv",
+        "jd64p",
+        1,
+        None,
+        "u",
+        None,
+        None,
+    )
+    assert download.local_name(a) == "google-analytics-data__README.md"
+    assert download.local_name(b) == "upworthy-timestamped-screenshots__README.md"
+    assert download.local_name(c) == "x-holdout-packages.csv"
