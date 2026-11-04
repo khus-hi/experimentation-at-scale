@@ -28,6 +28,13 @@ dev = [
     "hypothesis",
     "ruff",
 ]
+report = [
+    "ipykernel",
+    "nbclient",
+    "nbformat",
+    "pyyaml",
+    "tabulate",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

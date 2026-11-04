@@ -1,4 +1,5 @@
-PYTHON ?= python3.11
+PYTHON ?= python3
+QUARTO ?= quarto
 VENV := .venv
 PY := $(VENV)/bin/python
 
@@ -10,7 +11,7 @@ DBT := cd dbt && UPWORTHY_DB=$(DB) DBT_PROFILES_DIR=. ../$(PY) -W ignore::Runtim
 setup:
 	$(PYTHON) -m venv $(VENV)
 	$(PY) -m pip install --upgrade pip
-	$(PY) -m pip install -e ".[dev]"
+	$(PY) -m pip install -e ".[dev,report]"
 	$(PY) -c "import sys; print(sys.executable)"
 
 ingest:
@@ -55,10 +56,11 @@ winners-curse:
 winners-curse-doc:
 	$(PY) analysis/winners_curse_findings.py
 
-analysis:
-	$(PY) -c "print('analysis: not implemented yet')"
+analysis: srm peeking shrinkage portfolio findings winners-curse winners-curse-doc
 
 report:
-	$(PY) -c "print('report (Quarto): not implemented yet')"
+	@command -v $(QUARTO) >/dev/null 2>&1 || { echo "Quarto not found. Install the free CLI from https://quarto.org/docs/get-started/ (macOS: brew install --cask quarto)"; exit 1; }
+	QUARTO_PYTHON=$(CURDIR)/$(PY) $(QUARTO) render report/experimentation.qmd
+	@echo "report written to report/experimentation.html"
 
-all: ingest build test analysis report
+all: setup ingest build test analysis report
