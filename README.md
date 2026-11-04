@@ -50,6 +50,7 @@ Pure functions on counts that return frozen dataclasses; no pandas in the math.
 | `abtest.srm` | sample ratio mismatch: chi-square goodness of fit vs the expected split, flagged at p < 0.001 |
 | `abtest.sequential` | peeking simulator: a two-arm test streamed in daily batches, scored by naive peeking (stop at first p < 0.05), a Lan-DeMets O'Brien-Fleming group-sequential design, and the always-valid mSPRT p-value (normal mixture, Johari et al. 2017); calibrated to `fct_tests` |
 | `abtest.multiple` | Bonferroni, Holm, Benjamini-Hochberg and Benjamini-Yekutieli adjusted p-values (match statsmodels `multipletests`) and Storey's pi0; `within_test` (k - 1 arms vs a control, Holm), `portfolio` (one omnibus p per test, BH), `winner_survival` (declared winners that survive Holm within the test and BH across tests) |
+| `abtest.bayes` | Beta-binomial posteriors per arm, Monte Carlo P(best) and expected loss (seeded), and a "ship if expected loss < threshold" rule; empirical Bayes shrinkage of each test's best arm vs the rest on the log-odds scale, with a normal prior (method of moments) or a spike-at-zero plus normal prior (maximum likelihood), fitted on every arm before picking; `winners_curse` compares naive and shrunk lifts |
 
 `make srm` runs the SRM check and the omnibus test on every test in `fct_tests` and prints
 counts overall and inside vs outside the randomization-risk window (`analysis/srm_scan.py`).
@@ -61,6 +62,11 @@ no daily counts, so baseline CTR, n and number of looks are drawn jointly from r
 the randomization-risk window) and the daily stream is simulated. Number of looks has no column;
 it is the calendar days spanned by a test's arms' `created_at` (a lower bound on duration, 1 for
 most tests), and the sweep over 1 to 20 looks does not depend on it.
+
+`make shrinkage` (`analysis/shrinkage.py`) runs the Bayesian decision rule on every test and the
+empirical Bayes shrinkage of each test's best arm, prints the winner's curse summary and writes
+`analysis/output/shrinkage_summary.csv` (committed) and `shrinkage_tests.csv` (per test,
+gitignored). Tests in the randomization-risk window are excluded unless `--include-risk`.
 
 ## CI
 
