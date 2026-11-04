@@ -1,0 +1,6 @@
+rank,name,value,text
+1,srm_fail_inside_vs_outside,0.697307,"SRM fails in 69.7% of tests inside the risk window (4,893/7,017) vs 0.5% outside (119/25,468); A/A pairs at p < 0.05: 14.4% inside vs 13.3% outside (5% expected)"
+2,share_powered_for_10pct_lift,0,"0.0% of 25,347 clean tests could detect a 10% lift at 80% power (median MDE 89.2%)"
+3,storey_pi0,0.350941,Storey's pi0 = 0.35: about 65% of clean tests have some real difference between arms
+4,bh_significant,8984,"11,432 of 25,349 clean tests significant at p < 0.05 raw, 8,984 after BH at 5%"
+5,winners_surviving_both,0.073348,"7.3% of 5,917 declared winners survive Holm within the test and BH across tests (7.8% Holm only, 27.3% BH only)"
