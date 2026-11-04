@@ -39,3 +39,4 @@ report/.quarto/
 # Per-test analysis output (large; regenerate with make shrinkage / make portfolio)
 analysis/output/shrinkage_tests.csv
 analysis/output/portfolio_tests.csv
+analysis/output/winners_curse_tests.csv
