@@ -2,7 +2,7 @@ PYTHON ?= python3.11
 VENV := .venv
 PY := $(VENV)/bin/python
 
-.PHONY: setup ingest build docs summary fixture test srm analysis report all
+.PHONY: setup ingest build docs summary fixture test srm peeking analysis report all
 
 DB := $(CURDIR)/data/upworthy.duckdb
 DBT := cd dbt && UPWORTHY_DB=$(DB) DBT_PROFILES_DIR=. ../$(PY) -W ignore::RuntimeWarning -m dbt.cli.main
@@ -36,6 +36,9 @@ test:
 
 srm:
 	$(PY) analysis/srm_scan.py --db $(DB)
+
+peeking:
+	$(PY) analysis/peeking.py --db $(DB)
 
 analysis:
 	$(PY) -c "print('analysis: not implemented yet')"

@@ -48,10 +48,19 @@ Pure functions on counts that return frozen dataclasses; no pandas in the math.
 | `abtest.proportions` | pooled two-proportion z-test, Wilson CI per arm, Newcombe CI for the difference, relative lift with a delta-method CI, chi-square omnibus plus every arm vs a control (`multi_arm_test`) |
 | `abtest.power` | sample size per arm for a baseline and relative MDE, MDE for a given n, achieved power for observed n; k arms with Bonferroni `alpha / (k - 1)` (matches statsmodels `NormalIndPower`) |
 | `abtest.srm` | sample ratio mismatch: chi-square goodness of fit vs the expected split, flagged at p < 0.001 |
+| `abtest.sequential` | peeking simulator: a two-arm test streamed in daily batches, scored by naive peeking (stop at first p < 0.05), a Lan-DeMets O'Brien-Fleming group-sequential design, and the always-valid mSPRT p-value (normal mixture, Johari et al. 2017); calibrated to `fct_tests` |
 | `abtest.multiple` | Bonferroni, Holm, Benjamini-Hochberg and Benjamini-Yekutieli adjusted p-values (match statsmodels `multipletests`) and Storey's pi0; `within_test` (k - 1 arms vs a control, Holm), `portfolio` (one omnibus p per test, BH), `winner_survival` (declared winners that survive Holm within the test and BH across tests) |
 
 `make srm` runs the SRM check and the omnibus test on every test in `fct_tests` and prints
 counts overall and inside vs outside the randomization-risk window (`analysis/srm_scan.py`).
+
+`make peeking` (`analysis/peeking.py`) writes `analysis/output/peeking.csv` and
+`analysis/output/peeking_fpr.png`: false positive rate, power and sample saved vs a fixed-n
+test for each rule. It is a **calibrated simulation**: the archive has only final counts per arm,
+no daily counts, so baseline CTR, n and number of looks are drawn jointly from real tests (outside
+the randomization-risk window) and the daily stream is simulated. Number of looks has no column;
+it is the calendar days spanned by a test's arms' `created_at` (a lower bound on duration, 1 for
+most tests), and the sweep over 1 to 20 looks does not depend on it.
 
 ## CI
 
