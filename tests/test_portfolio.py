@@ -138,3 +138,24 @@ def test_mde_edge_cases():
     assert np.isnan(mod._mde(0.0, 1000, 2))
     assert np.isinf(mod._mde(0.5, 1, 2))
     assert 0 < mod._mde(0.02, 5000, 2) < mod._mde(0.02, 5000, 4)
+
+
+def test_findings_doc_is_generated_from_the_csvs(warehouse, tmp_path):
+    out, doc = tmp_path / "out", tmp_path / "findings.md"
+    assert _portfolio().main(["--db", str(warehouse), "--out", str(out), "--no-figures"]) == 0
+    spec = importlib.util.spec_from_file_location(
+        "portfolio_findings", ROOT / "analysis" / "portfolio_findings.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert mod.main(["--out", str(out), "--doc", str(doc)]) == 0
+    text = doc.read_text()
+    inf = pd.read_csv(out / "portfolio_inference.csv")
+    v = inf[inf["sample"] == "clean"].set_index("metric")["value"]
+    win = pd.read_csv(out / "portfolio_winners.csv")
+    w = win[win["dimension"] == "all"].iloc[0]
+    assert f"pi0 = {v['pi0']:.2f}" in text
+    assert f"{int(v['n_bh_significant']):,} after Benjamini-Hochberg" in text
+    assert f"{100 * w['share_survive_both']:.1f}% of {int(w['n_with_winner']):,} declared" in text
+    assert "## 4. Upworthy's declared winners" in text
+    assert mod.main(["--out", str(tmp_path / "nothing"), "--doc", str(doc)]) == 1
