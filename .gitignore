@@ -36,5 +36,6 @@ report/.quarto/
 # macOS
 .DS_Store
 
-# Per-test analysis output (large; regenerate with make shrinkage)
+# Per-test analysis output (large; regenerate with make shrinkage / make portfolio)
 analysis/output/shrinkage_tests.csv
+analysis/output/portfolio_tests.csv

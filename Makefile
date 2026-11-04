@@ -2,7 +2,7 @@ PYTHON ?= python3.11
 VENV := .venv
 PY := $(VENV)/bin/python
 
-.PHONY: setup ingest build docs summary fixture test srm peeking shrinkage analysis report all
+.PHONY: setup ingest build docs summary fixture test srm peeking shrinkage portfolio analysis report all
 
 DB := $(CURDIR)/data/upworthy.duckdb
 DBT := cd dbt && UPWORTHY_DB=$(DB) DBT_PROFILES_DIR=. ../$(PY) -W ignore::RuntimeWarning -m dbt.cli.main
@@ -42,6 +42,9 @@ shrinkage:
 
 peeking:
 	$(PY) analysis/peeking.py --db $(DB)
+
+portfolio:
+	$(PY) analysis/portfolio.py --db $(DB)
 
 analysis:
 	$(PY) -c "print('analysis: not implemented yet')"
