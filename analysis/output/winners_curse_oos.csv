@@ -1,0 +1,19 @@
+target,check,prior,fitted_on,n_tests,n,coverage95,mean_log_score,prior_pi0,prior_mu,prior_tau,mean_pred,mean_half_b,mse,mse_true,bias,slope
+confirmatory,predictive,normal,exploratory,17741,85286,0.951,-0.365872,0,-0.0369061,0.293055,,,,,,
+confirmatory,predictive,normal,confirmatory (in-sample),17741,85286,0.95521,-0.369544,0,-0.038504,0.303503,,,,,,
+confirmatory,predictive,spike_slab,exploratory,17741,85286,0.944117,-0.346095,0.34756,-0.00840057,0.320265,,,,,,
+confirmatory,predictive,spike_slab,confirmatory (in-sample),17741,85286,0.947201,-0.345821,0.328309,-0.0100194,0.32476,,,,,,
+confirmatory,thinning,naive,none,17741,20,,,,,,0.455898,0.200609,0.21984,0.12797,0.255289,0.557714
+confirmatory,thinning,normal,confirmatory half A (in-sample),17741,20,,,,,,0.245412,0.200609,0.138648,0.0467777,0.0448031,1.11793
+confirmatory,thinning,spike_slab,confirmatory half A (in-sample),17741,20,,,,,,0.219902,0.200609,0.136339,0.0444691,0.0192931,1.01629
+confirmatory,thinning,normal,exploratory,17741,20,,,,,,0.240599,0.200609,0.138516,0.0466464,0.0399908,1.15739
+confirmatory,thinning,spike_slab,exploratory,17741,20,,,,,,0.221527,0.200609,0.136411,0.0445408,0.0209182,1.02272
+holdout,predictive,normal,exploratory,3803,18255,0.94785,-0.376514,0,-0.0369061,0.293055,,,,,,
+holdout,predictive,normal,holdout (in-sample),3803,18255,0.952616,-0.380695,0,-0.0389356,0.305556,,,,,,
+holdout,predictive,spike_slab,exploratory,3803,18255,0.942372,-0.358153,0.34756,-0.00840057,0.320265,,,,,,
+holdout,predictive,spike_slab,holdout (in-sample),3803,18255,0.946261,-0.357742,0.327661,-0.0100775,0.327112,,,,,,
+holdout,thinning,naive,none,3803,20,,,,,,0.46134,0.19885,0.230385,0.134446,0.262491,0.548994
+holdout,thinning,normal,holdout half A (in-sample),3803,20,,,,,,0.246611,0.19885,0.144754,0.0488154,0.0477618,1.11479
+holdout,thinning,spike_slab,holdout half A (in-sample),3803,20,,,,,,0.222526,0.19885,0.142186,0.0462474,0.0236768,1.02425
+holdout,thinning,normal,exploratory,3803,20,,,,,,0.240575,0.19885,0.144524,0.0485848,0.0417251,1.16071
+holdout,thinning,spike_slab,exploratory,3803,20,,,,,,0.221929,0.19885,0.142197,0.0462587,0.0230794,1.02909
