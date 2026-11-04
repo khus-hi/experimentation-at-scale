@@ -51,6 +51,7 @@ Pure functions on counts that return frozen dataclasses; no pandas in the math.
 | `abtest.sequential` | peeking simulator: a two-arm test streamed in daily batches, scored by naive peeking (stop at first p < 0.05), a Lan-DeMets O'Brien-Fleming group-sequential design, and the always-valid mSPRT p-value (normal mixture, Johari et al. 2017); calibrated to `fct_tests` |
 | `abtest.multiple` | Bonferroni, Holm, Benjamini-Hochberg and Benjamini-Yekutieli adjusted p-values (match statsmodels `multipletests`) and Storey's pi0; `within_test` (k - 1 arms vs a control, Holm), `portfolio` (one omnibus p per test, BH), `winner_survival` (declared winners that survive Holm within the test and BH across tests) |
 | `abtest.bayes` | Beta-binomial posteriors per arm, Monte Carlo P(best) and expected loss (seeded), and a "ship if expected loss < threshold" rule; empirical Bayes shrinkage of each test's best arm vs the rest on the log-odds scale, with a normal prior (method of moments) or a spike-at-zero plus normal prior (maximum likelihood), fitted on every arm before picking; `winners_curse` compares naive and shrunk lifts |
+| `abtest.thinning` | data thinning: `split_binomial` splits each arm's impressions at random and draws its clicks hypergeometrically, giving two independent half-tests under the binomial model; vectorized arm-vs-rest contrasts and `replicate_winners` (pick on half A, measure on half B) over many tests at once |
 
 `make srm` runs the SRM check and the omnibus test on every test in `fct_tests` and prints
 counts overall and inside vs outside the randomization-risk window (`analysis/srm_scan.py`).
@@ -79,6 +80,16 @@ Results on the real archive (25,468 tests outside the randomization-risk window,
   (log likelihood +2,884 on 122,377 arm contrasts) and puts 33% of arms at exactly no
   difference from the rest. Fitted on winners only, the prior keeps 98% of the naive lift,
   which is why it is fitted on every arm.
+
+`make winners-curse` (`analysis/winners_curse.py`) measures the winner's curse by data thinning
+on every clean test (outside the risk window, no SRM): each test is split 50/50 over 20 fixed
+seeds, the best arm is picked on half A and measured on half B. It writes
+`analysis/output/winners_curse_*.csv` and four figures: naive vs replicated lift, how often the
+half-A winner is still best, MSE and calibration of the empirical Bayes shrunk lifts (prior fitted
+on half A only) against half B, the prior fitted on the exploratory tests and checked on the
+confirmatory and holdout tests, and within-test associations of headline features (length, digit,
+question, "you", VADER sentiment) with CTR. `make winners-curse-doc` renders
+`docs/winners_curse.md` from those CSVs.
 
 ## CI
 

@@ -2,7 +2,7 @@ PYTHON ?= python3.11
 VENV := .venv
 PY := $(VENV)/bin/python
 
-.PHONY: setup ingest build docs summary fixture test srm peeking shrinkage portfolio findings analysis report all
+.PHONY: setup ingest build docs summary fixture test srm peeking shrinkage portfolio findings winners-curse winners-curse-doc analysis report all
 
 DB := $(CURDIR)/data/upworthy.duckdb
 DBT := cd dbt && UPWORTHY_DB=$(DB) DBT_PROFILES_DIR=. ../$(PY) -W ignore::RuntimeWarning -m dbt.cli.main
@@ -48,6 +48,12 @@ portfolio:
 
 findings:
 	$(PY) analysis/portfolio_findings.py
+
+winners-curse:
+	$(PY) analysis/winners_curse.py --db $(DB)
+
+winners-curse-doc:
+	$(PY) analysis/winners_curse_findings.py
 
 analysis:
 	$(PY) -c "print('analysis: not implemented yet')"

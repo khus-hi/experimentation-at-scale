@@ -18,6 +18,7 @@ dependencies = [
     "pyarrow",
     "matplotlib",
     "requests",
+    "vaderSentiment",
 ]
 
 [project.optional-dependencies]
