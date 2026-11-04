@@ -68,6 +68,18 @@ empirical Bayes shrinkage of each test's best arm, prints the winner's curse sum
 `analysis/output/shrinkage_summary.csv` (committed) and `shrinkage_tests.csv` (per test,
 gitignored). Tests in the randomization-risk window are excluded unless `--include-risk`.
 
+Results on the real archive (25,468 tests outside the randomization-risk window, 2026-11-04):
+
+- The beta-binomial rule (ship when expected loss < 1% of the arm's CTR) ships 21.9% of tests
+  and keeps testing the rest. Of the 5,958 tests with a declared winner, it picks the same arm
+  in 72.4%. The declared winners' median P(best) is 0.61; 37.9% are below 0.5.
+- The best observed arm beats the rest of its test by 48.4% (mean log OR 0.395, as relative
+  lift). After shrinkage that is 31.3% (normal prior) or 28.9% (spike + normal), so about a
+  third of the reported lift is the winner's curse. The spike + normal prior fits far better
+  (log likelihood +2,884 on 122,377 arm contrasts) and puts 33% of arms at exactly no
+  difference from the rest. Fitted on winners only, the prior keeps 98% of the naive lift,
+  which is why it is fitted on every arm.
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request: ruff (lint and

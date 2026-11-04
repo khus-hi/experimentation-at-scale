@@ -186,15 +186,15 @@ def report(
         "",
         "2-3. Empirical Bayes shrinkage of the best observed arm vs the rest (log odds ratio)",
         f"   {'prior':<38}{'pi0':>6}{'mu':>8}{'tau':>7}{'naive':>8}{'shrunk':>8}"
-        f"{'kept':>7}{'naive%':>8}{'shrunk%':>8}{'excl0 raw':>10}{'excl0 EB':>9}",
+        f"{'kept':>7}{'naive%':>8}{'shrunk%':>8}{'excl0 raw':>11}{'excl0 EB':>10}",
     ]
     for r in summary_rows(fits):
         lines.append(
             f"   {r['fit']:<38}{r['prior_pi0']:>6.2f}{r['prior_mu']:>8.3f}{r['prior_tau']:>7.3f}"
             f"{r['mean_naive']:>8.3f}{r['mean_shrunk']:>8.3f}{r['retained']:>7.0%}"
             f"{r['mean_naive_rel']:>8.1%}{r['mean_shrunk_rel']:>8.1%}"
-            f"{r['share_interval_excludes_zero_naive']:>10.1%}"
-            f"{r['share_interval_excludes_zero_shrunk']:>9.1%}"
+            f"{r['share_interval_excludes_zero_naive']:>11.1%}"
+            f"{r['share_interval_excludes_zero_shrunk']:>10.1%}"
         )
     spike = fits[FITS[1][2]]
     normal = fits[FITS[0][2]]
