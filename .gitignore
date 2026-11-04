@@ -32,6 +32,10 @@ logs/
 # Quarto
 report/_site/
 report/.quarto/
+report/experimentation.html
+report/experimentation_files/
+report/*.ipynb
+_site/
 
 # macOS
 .DS_Store

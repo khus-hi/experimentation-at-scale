@@ -1,0 +1,62 @@
+name: Report
+
+# Renders report/experimentation.qmd from the committed CSVs and figures in analysis/output
+# (never from the raw archive) and publishes it to GitHub Pages on pushes to main.
+# Pull requests render it as a check but do not deploy.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install
+        run: python -m pip install -e ".[report]"
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.6.40
+
+      - name: Render
+        run: |
+          QUARTO_PYTHON="$(which python)" quarto render report/experimentation.qmd
+          mkdir -p _site
+          cp report/experimentation.html _site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: render
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
