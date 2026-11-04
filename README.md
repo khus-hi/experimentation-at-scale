@@ -48,6 +48,7 @@ Pure functions on counts that return frozen dataclasses; no pandas in the math.
 | `abtest.proportions` | pooled two-proportion z-test, Wilson CI per arm, Newcombe CI for the difference, relative lift with a delta-method CI, chi-square omnibus plus every arm vs a control (`multi_arm_test`) |
 | `abtest.power` | sample size per arm for a baseline and relative MDE, MDE for a given n, achieved power for observed n; k arms with Bonferroni `alpha / (k - 1)` (matches statsmodels `NormalIndPower`) |
 | `abtest.srm` | sample ratio mismatch: chi-square goodness of fit vs the expected split, flagged at p < 0.001 |
+| `abtest.multiple` | Bonferroni, Holm, Benjamini-Hochberg and Benjamini-Yekutieli adjusted p-values (match statsmodels `multipletests`) and Storey's pi0; `within_test` (k - 1 arms vs a control, Holm), `portfolio` (one omnibus p per test, BH), `winner_survival` (declared winners that survive Holm within the test and BH across tests) |
 
 `make srm` runs the SRM check and the omnibus test on every test in `fct_tests` and prints
 counts overall and inside vs outside the randomization-risk window (`analysis/srm_scan.py`).
